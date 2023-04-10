@@ -58,7 +58,6 @@ def embedding(inputs,
               with_t=False,
               reuse=None):
     '''Embeds a given tensor.
-
     Args:
       inputs: A `Tensor` with type `int32` or `int64` containing the ids
          to be looked up in `lookup table`.
@@ -70,7 +69,6 @@ def embedding(inputs,
       scope: Optional scope for `variable_scope`.
       reuse: Boolean, whether to reuse the weights of a previous layer
         by the same name.
-
     Returns:
       A `Tensor` with one more rank than inputs's. The last dimensionality
         should be `num_units`.
@@ -89,7 +87,6 @@ def embedding(inputs,
     [[[ 0.          0.        ]
       [ 0.09754146  0.67385566]
       [ 0.37864095 -0.35689294]]
-
      [[-1.01329422 -1.09939694]
       [ 0.7521342   0.38203377]
       [-0.04973143 -0.06210355]]]
@@ -107,7 +104,6 @@ def embedding(inputs,
     [[[-0.19172323 -0.39159766]
       [-0.43212751 -0.66207761]
       [ 1.03452027 -0.26704335]]
-
      [[-0.11634696 -0.35983452]
       [ 0.50208133  0.53509563]
       [ 1.22204471 -0.96587461]]]    
@@ -117,8 +113,8 @@ def embedding(inputs,
         lookup_table = tf.get_variable('lookup_table',
                                        dtype=tf.float32,
                                        shape=[vocab_size, num_units],
-                                       #initializer=tf.contrib.layers.xavier_initializer(),
-                                       regularizer=tf.contrib.layers.l2_regularizer(l2_reg))
+                                       initializer=tf.contrib.layers.xavier_initializer())
+                                       # regularizer=tf.contrib.layers.l2_regularizer(l2_reg))
         if zero_pad:
             lookup_table = tf.concat((tf.zeros(shape=[1, num_units]),
                                       lookup_table[1:, :]), 0)
@@ -166,9 +162,9 @@ def multihead_attention(queries,
         # Q = tf.layers.dense(queries, num_units, activation=tf.nn.relu) # (N, T_q, C)
         # K = tf.layers.dense(keys, num_units, activation=tf.nn.relu) # (N, T_k, C)
         # V = tf.layers.dense(keys, num_units, activation=tf.nn.relu) # (N, T_k, C)
-        Q = tf.layers.dense(queries, num_units, activation=None) # (N, T_q, C)
-        K = tf.layers.dense(keys, num_units, activation=None) # (N, T_k, C)
-        V = tf.layers.dense(keys, num_units, activation=None) # (N, T_k, C)
+        Q = tf.layers.dense(queries, num_units, activation='sigmoid') # (N, T_q, C)
+        K = tf.layers.dense(keys, num_units, activation='sigmoid') # (N, T_k, C)
+        # V = tf.layers.dense(keys, num_units, activation='sigmoid') # (N, T_k, C)
         
         # Split and concat
         Q_ = tf.concat(tf.split(Q, num_heads, axis=2), axis=0) # (h*N, T_q, C/h) 
@@ -180,6 +176,7 @@ def multihead_attention(queries,
         
         # Scale
         outputs = outputs / (K_.get_shape().as_list()[-1] ** 0.5)
+        # outputs = tf.math.sigmoid(outputs) / (K_.get_shape().as_list()[-1] ** 0.5)
         
         # Key Masking
         key_masks = tf.sign(tf.reduce_sum(tf.abs(keys), axis=-1)) # (N, T_k)

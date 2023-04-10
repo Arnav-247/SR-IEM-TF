@@ -1,0 +1,25 @@
+dataset= 'ratings_processed_train'
+dataset_test = 'ratings_processed_test'
+data_dir = 'ml-25m'
+train_dir='train'
+batch_size= 512
+eval_batch_size = 512
+lr=0.0001
+maxlen=20
+cand_size = 250
+hidden_units=200
+num_epochs=50
+l2_reg=0.00001
+
+# dataset= 'ratings_processed_train'
+# dataset_test = 'ratings_processed_test'
+# data_dir = 'ml-1m'
+# train_dir='train'
+# batch_size= 512
+# eval_batch_size = 512
+# lr=0.0005
+# maxlen=40
+# cand_size = 250
+# hidden_units=50
+# num_epochs=300
+# l2_reg=0.00001
